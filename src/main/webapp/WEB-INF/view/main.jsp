@@ -1,11 +1,10 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
-    
-    <!--  header.jsp -->
-    <%@ include file="/WEB-INF/view/layout/header.jsp" %>
-    
-    <!-- start of content.jsp (xxx.jsp) -->
-    
+	
+	<!-- header.jsp  -->
+	<%@ include file="/WEB-INF/view/layout/header.jsp" %>	
+    	
+    <!-- start of content.jsp(xxx.jsp)   -->	
     <div class="col-sm-8">
       <h2>TITLE HEADING</h2>
       <h5>Title description, Dec 7, 2017</h5>
@@ -21,10 +20,10 @@
     </div>
   </div>
 </div>
+<!-- end of content.jsp(xxx.jsp)   -->
 
-	<!-- end of content.jsp (xxx.jsp) -->
-	
-	<!--  footer.jsp -->
-    <%@ include file="/WEB-INF/view/layout/footer.jsp" %>
-	
+<!-- footer.jsp  -->
+<%@ include file="/WEB-INF/view/layout/footer.jsp" %>	
 
+    
+    
