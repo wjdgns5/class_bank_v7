@@ -49,7 +49,7 @@ public class MainController {
 	// http://localhost:8080/error-test2
 	@GetMapping("/error-test2")
 	public String errorData2() {
-		System.out.println("111111111111");
+		System.out.println("2222222222222");
 		
 		if(true) {
 			throw new DataDeliveryException("잘못된 데이터 입니다.", HttpStatus.BAD_REQUEST);
@@ -61,6 +61,7 @@ public class MainController {
 	// http://localhost:8080/error-test3
 	@GetMapping("/error-test3")
 	public String errorData3() {
+		System.out.println("33333333333333");
 		
 		if(true) {
 			throw new UnAuthorizedException("인증 안된 사용자 입니다.", HttpStatus.UNAUTHORIZED);

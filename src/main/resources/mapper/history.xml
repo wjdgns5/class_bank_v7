@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.tenco.bank.repository.interfaces.HistoryRepository">
+
+	<!-- 반드시 세미콜론을 제거 해야 한다.   -->
+	<!-- id는 매칭되어 있는 인터페이스에 메서드 명과 같아야 한다.  -->	
+	
+	<insert id="insert">
+		insert into history_tb(amount, w_Balance, d_Balance, w_Account_id, d_account_id )
+		values(#{amount}, #{wBalance}, #{dBalance}, #{wAccountId}, #{dAccountId} )
+	</insert>
+	
+	<update id="updateById">
+		update history_tb
+		set amount = #{amount},
+			w_Balance = #{wBalance},
+			d_Balance = #{dBalance},
+			w_Account_id = #{wAccountId},
+			d_account_id = #{dAccountId}
+		where id = #{id}
+		
+	</update>
+	
+	<delete id="deleteById">
+		delete from history_tb where id = #{id}
+	
+	</delete>
+	
+	<select id="findById" resultType="com.tenco.bank.repository.model.History">
+		select * from history_tb where id = #{id}
+	
+	</select>
+	
+	<select id="findAll" resultType="com.tenco.bank.repository.model.History">
+		select * from history_tb
+	
+	</select>
+	
+
+</mapper>
