@@ -11,7 +11,7 @@ public class RedirectException extends RuntimeException {
 	// RuntimeException 상속받아 예외 처리 
 	
 	private HttpStatus status;
-	
+	// throw new RedirectException(???, ???);
 	public RedirectException(String message, HttpStatus status) {
 		super(message);
 		this.status = status;
