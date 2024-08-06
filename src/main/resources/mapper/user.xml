@@ -9,9 +9,8 @@
 	
 	<!-- id는 매칭되어 있는 인터페이스에 메서드 명과 같아야 한다.  -->
 	<insert id="insert">
-		insert into user_tb(username, password, fullname, created_at)
-		values( #{username}, #{password}, #{fullname}, #{createdAt} )
-		
+		insert into user_tb(username, password, fullname, created_at) 
+		values( #{username}, #{password}, #{fullname}, now())
 	</insert>
 	
 	<update id="updateById">
@@ -31,7 +30,7 @@
 		
 	</select>
 	
-	<select id="findAll" resultMap=""> <!--  다중행으로 떨어진다 --> 
+	<select id="findAll" resultType="com.tenco.bank.repository.model.User"> <!--  다중행으로 떨어진다 --> 
 		select * from user_tb
 	
 	</select>
