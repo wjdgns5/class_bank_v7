@@ -15,8 +15,14 @@ import com.tenco.bank.service.UserService;
 @RequestMapping("/user") // 대문 처리 
 public class UserController {
 	
-	@Autowired // DI 처리 
+	
 	private UserService userService;
+	
+	// DI 처리
+	@Autowired // 노란색 경고는 사용할 필요는 없음 -- 가독성을 위해서 선언해도 됨
+	public UserController(UserService service) {
+		this.userService = service;
+	}
 
 	/**
 	 * 회원 가입 페이지 요청 
@@ -39,7 +45,7 @@ public class UserController {
 	 */
 	@PostMapping("/sign-up")
 	public String signUpProc(SignUpDTO dto) {
-		
+		System.out.println("test : " + dto.toString());
 		// controller 에서 일반적이 코드 작업 
 		// 1. 인증검사 (여기서는 인증검사 불 필요) 
 		// 2. 유효성 검사 

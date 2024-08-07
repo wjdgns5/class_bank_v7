@@ -19,7 +19,7 @@ public class MainController {
 	// http:localhost:8080/main-page
 	// http:localhost:8080/index
 	@GetMapping({"/main-page", "/index"})
-	@ResponseBody
+//	@ResponseBody
 	public String mainPage() {
 		System.out.println("mainPage() 호출 확인");
 		// [JSP 파일 찾기 (yml 설정) ] - 뷰 리졸버 
