@@ -1,8 +1,11 @@
 package com.tenco.bank.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.tenco.bank.dto.SaveDTO;
 import com.tenco.bank.handler.exception.DataDeliveryException;
 import com.tenco.bank.handler.exception.UnAuthorizedException;
+import com.tenco.bank.repository.model.Account;
 import com.tenco.bank.repository.model.User;
 import com.tenco.bank.service.AccountService;
 
@@ -82,4 +86,35 @@ public class AccountController {
 		
 		return "redirect:/index";
 	}
+	
+	/**
+	 * 계좌 목록 화면 요청
+	 * 주소 설계 : http://localhost:8080/account/list, ..../
+	 * @return list.jsp
+	 */
+	// 페이지 리턴해야 되서 string으로 짓는다.
+	@GetMapping({"/list", "/"})
+	public String listPage(Model model) {
+		
+		// 1. 인증검사
+		User principal = (User) session.getAttribute("principal"); // 유저세션 가져옴
+		if(principal == null) {
+			// 로그인을 안한 상태
+			throw new UnAuthorizedException("인증된 사용자가 아닙니다.", HttpStatus.UNAUTHORIZED);
+		}
+		// 2. 유효성 검사
+		
+		// 3. 서비스 호출 (서비스컨트롤러 : 핵심기능 )
+		List<Account> accountList = accountService.readAccountListByUserId(principal.getId());
+		if(accountList.isEmpty()) {
+			model.addAttribute("accountList", null);
+		} else {
+			model.addAttribute("accountList", accountList); // 모델에서 키,값을 던져버린다.
+		}
+	
+		// JSP 데이터를 넣어 주는 방법
+		return "account/list";
+		
+	}
+
 }
