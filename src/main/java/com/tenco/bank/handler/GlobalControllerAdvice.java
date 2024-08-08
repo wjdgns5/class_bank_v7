@@ -57,8 +57,8 @@ public class GlobalControllerAdvice {
 		
 		StringBuffer sb = new StringBuffer();
 		sb.append(" <script>");
-		sb.append(" alert('"+ e.getMessage() +"');");
-		sb.append(" window.history.back();"); // 뒤로가기
+		sb.append(" alert('"+ e.getMessage() +"');"); // 경고창 뜸
+		sb.append(" location.href='/user/sign-in';"); // 로그인 페이지로 이동
 		sb.append(" </script>");
 		
 		return sb.toString();
