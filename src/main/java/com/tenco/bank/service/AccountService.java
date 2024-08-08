@@ -1,14 +1,18 @@
 package com.tenco.bank.service;
 
+import java.security.Principal;
 import java.util.List;
 
+import org.h2.value.Transfer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.tenco.bank.dto.DepositDTO;
 import com.tenco.bank.dto.SaveDTO;
+import com.tenco.bank.dto.TransferDTO;
 import com.tenco.bank.dto.WithdrawalDTO;
 import com.tenco.bank.handler.exception.DataDeliveryException;
 import com.tenco.bank.handler.exception.RedirectException;
@@ -81,7 +85,6 @@ public class AccountService {
 		
 	}
 	
-	
 	 // 한번에 모든 기능을 생각하는 것은 힘듬
 	 // 1. 사용자가 던진 계좌번호가 존재하는지 여부를 확인해야 한다. --> select 
 	 // 2. 본인 계좌 여부를 확인해야 한다. --> 객체 상태값에서 비교한다.
@@ -136,5 +139,94 @@ public class AccountService {
 			throw new DataDeliveryException(Define.FAILED_PROCESSING, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-
+	
+	// 1. 계좌 존재 여부를 확인
+    // 2. 본인 계좌 여부를 확인 -- 객체 상태값에서 비교
+    // 3. 입금 처리 -- update
+    // 4. 거래 내역 등록 -- insert(history)
+    @Transactional
+    public void updateAccountDeposit(DepositDTO dto, Integer principalId) {
+        // 1.
+        Account accountEntity = accountRepository.findByNumber(dto.getDAccountNumber());
+        if (accountEntity == null) {
+            throw new DataDeliveryException(Define.NOT_EXIST_ACCOUNT, HttpStatus.BAD_REQUEST);
+        }
+        // 2.
+        accountEntity.checkOwner(principalId);
+        // 3.
+        accountEntity.deposit(dto.getAmount());
+        accountRepository.updateById(accountEntity);
+        // 4.
+        History history = History.builder()
+            .amount(dto.getAmount())
+            .dAccountId(accountEntity.getId())
+            .dBalance(accountEntity.getBalance())
+            .wAccountId(null)
+            .wBalance(null)
+            .build();
+        int rowResultCount = historyRepository.insert(history);
+        if (rowResultCount != 1) {
+            throw new DataDeliveryException(Define.FAILED_PROCESSING, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    
+    // 이체 기능 만들기
+    // 1. 출금 계좌 존재여부 확인 -- select (객체 리턴 받은 상태)
+    // 2. 입금 계좌 존재여부 확인 -- select (객체 리턴 받은 상태)
+    // 3. 출금 계좌 본인 소유 확인 -- 객체 상태값과 세션 아이디(ID) 비교
+    // 4. 출금 계좌 비밀 번호 확인 -- 객체 상태값과 dto 비밀번호 비교
+    // 5. 출금 계좌 잔액 여부 확인 -- 객체 상태값 확인, dto와 비교
+    // 6. 입금 계좌 객체 상태값 변경 처리 (거래금액 증가처리)
+    // 7. 입금 계좌 -- update 처리 
+    // 8. 출금 계좌 객체 상태값 변경 처리 (잔액 - 거래금액)
+    // 9. 출금 계좌 -- update 처리 
+    // 10. 거래 내역 등록 처리
+    // 11. 트랜잭션 처리
+    public void updateAccountTransfer(TransferDTO dto, Integer principalId) {
+    	
+    	// 출금 계좌 정보 조회 
+    	Account withdrawAccountEntity = accountRepository.findByNumber(dto.getWAccountNumber());
+    	System.out.println("withdrawAccountEntity : " + withdrawAccountEntity);
+    	
+    	// 입금 계좌 정보 조회
+    	Account depositAccountEntity = accountRepository.findByNumber(dto.getDAccountNumber());
+    	System.out.println("depositAccountEntity : " + depositAccountEntity);
+    	
+    	if(withdrawAccountEntity == null) {
+    		throw new DataDeliveryException(Define.NOT_EXIST_ACCOUNT, HttpStatus.INTERNAL_SERVER_ERROR);
+    	}
+    	
+    	if(depositAccountEntity == null) {
+    		throw new DataDeliveryException("상대방의 계좌 번호가 없습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
+    	}
+    	
+    	withdrawAccountEntity.checkOwner(principalId); // 출금하는 내 계좌가 내껀지 확인
+    	withdrawAccountEntity.checkPassword(dto.getPassword()); // 출금하는 내 계좌의 비밀번호가 맞는지 Transfer DTO의 password 랑 비교
+    	withdrawAccountEntity.checkBalance(dto.getAmount());
+    	withdrawAccountEntity.withdraw(dto.getAmount()); 
+    	
+    	depositAccountEntity.deposit(dto.getAmount());
+    	
+    	int resultRowCountWithdraw = accountRepository.updateById(withdrawAccountEntity); // 새로 갱신
+    	int resultRowCountDeposit = accountRepository.updateById(depositAccountEntity); // 새로 갱신
+    	
+    	if(resultRowCountWithdraw != 1 && resultRowCountDeposit != 1) {
+    		throw new DataDeliveryException(Define.FAILED_PROCESSING, HttpStatus.INTERNAL_SERVER_ERROR);
+    	}
+    	
+    	// TransferDTO 에 History 객체를 반환하는 메서들 만들어 줄 수 있습니다. 
+    	History history = History.builder()
+    							 .amount(dto.getAmount()) // 이체 금액
+    							 .wAccountId(withdrawAccountEntity.getId()) // 출금 계좌
+    							 .dAccountId(depositAccountEntity.getId()) // 입금 계좌
+    							 .wBalance(withdrawAccountEntity.getBalance()) // 출금 계좌 남은 잔액
+    							 .dBalance(depositAccountEntity.getBalance()) // 입금 계좌 남은 잔액
+    							 .build();
+    	
+    	int resultRowCountHistory = historyRepository.insert(history);
+    	if(resultRowCountHistory != 1) {
+    		throw new DataDeliveryException(Define.FAILED_PROCESSING, HttpStatus.INTERNAL_SERVER_ERROR);
+    		}
+    	}  	
 }
+
