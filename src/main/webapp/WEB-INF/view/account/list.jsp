@@ -30,7 +30,7 @@
 						<tr>
 							<%-- 동적 작동하는 부분 Type=all --%>
 							<td> <a href="/account/detail/${account.id}?type=all">${account.number}</a>  </td>
-							<td>${account.balance}</td>
+							<td>${ account.formatKoreanWon(account.balance)}</td>
 						</tr>
 					</c:forEach>
 				</tbody>	
