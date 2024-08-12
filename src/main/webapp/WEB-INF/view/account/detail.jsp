@@ -52,9 +52,6 @@
 		
 	</div>
 	
-	
-	
-	
 
 </div>
 <!-- end of content.jsp(xxx.jsp)   -->

@@ -18,6 +18,5 @@ public abstract class ValueFormatter {
 		String formatNumber = df.format(amount);
 		return formatNumber + "원";
 	}
-	
 
 }
