@@ -3,76 +3,119 @@
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 
-<mapper namespace="com.tenco.bank.repository.interfaces.HistoryRepository">
+<mapper
+	namespace="com.tenco.bank.repository.interfaces.HistoryRepository">
 
-	<!-- 반드시 세미콜론을 제거 해야 한다.   -->
-	<!-- id는 매칭되어 있는 인터페이스에 메서드 명과 같아야 한다.  -->	
-	
+	<!-- 반드시 세미콜론을 제거 해야 한다. -->
+	<!-- id는 매칭되어 있는 인터페이스에 메서드 명과 같아야 한다. -->
+
 	<insert id="insert">
-		insert into history_tb(amount, w_Balance, d_Balance, w_Account_id, d_account_id )
-		values(#{amount}, #{wBalance}, #{dBalance}, #{wAccountId}, #{dAccountId} )
+		insert into history_tb(amount, w_Balance, d_Balance,
+		w_Account_id, d_account_id )
+		values(#{amount}, #{wBalance},
+		#{dBalance}, #{wAccountId}, #{dAccountId} )
 	</insert>
-	
+
 	<update id="updateById">
 		update history_tb
 		set amount = #{amount},
-			w_Balance = #{wBalance},
-			d_Balance = #{dBalance},
-			w_Account_id = #{wAccountId},
-			d_account_id = #{dAccountId}
+		w_Balance = #{wBalance},
+		d_Balance = #{dBalance},
+		w_Account_id = #{wAccountId},
+		d_account_id = #{dAccountId}
 		where id = #{id}
-		
+
 	</update>
-	
+
 	<delete id="deleteById">
 		delete from history_tb where id = #{id}
-	
+
 	</delete>
-	
-	<select id="findById" resultType="com.tenco.bank.repository.model.History">
+
+	<select id="findById"
+		resultType="com.tenco.bank.repository.model.History">
 		select * from history_tb where id = #{id}
-	
+
 	</select>
-	
-	<select id="findAll" resultType="com.tenco.bank.repository.model.History">
+
+	<select id="findAll"
+		resultType="com.tenco.bank.repository.model.History">
 		select * from history_tb
-	
+
 	</select>
-	
-		<select id="findByAccountIdAndTypeOfHistory" resultType="com.tenco.bank.repository.model.HistoryAccount">
+
+	<select id="findByAccountIdAndTypeOfHistory"
+		resultType="com.tenco.bank.repository.model.HistoryAccount">
 		<if test="type == 'all'">
 			select h.id, h.amount,
-				case
-					when h.w_account_id = #{accountId} then (h.w_balance) 
-			        when h.d_account_id = #{accountId} then (h.d_balance)
-			    end  as balance,
-			    coalesce(cast(wa.number as char(10)), 'ATM') as sender, 
-			    coalesce(cast(da.number as char(10)), 'ATM') as receiver,
-			    h.created_at
+			case
+			when h.w_account_id = 1 then (h.w_balance)
+			when h.d_account_id = 1 then (h.d_balance)
+			end as balance,
+			coalesce( cast(wa.number as char(10)), 'ATM') as sender,
+			coalesce( cast(da.number as char(10)), 'ATM') as receiver,
+			h.created_at
+			from history_tb as h
+
+			left join account_tb as wa
+			on h.w_account_id = wa.id
+
+			left join account_tb as da
+			on h.d_account_id = da.id
+
+			where h.w_account_id = 1 OR h.d_account_id = #{accountId}
+			limit #{limit} offset #{offset}
+
+		</if>
+
+		<if test="type == 'deposit'">
+			select h.id, h.amount, h.d_balance as balance,
+			h.created_at,
+			coalesce(cast(wa.number as CHAR(10)), 'ATM') as sender,
+			da.number as receiver
+			from history_tb as h
+			left join account_tb as wa on wa.id = h.w_account_id
+			left join account_tb as da on da.id = h.d_account_id
+			where h.d_account_id = #{accountId}
+			limit #{limit} offset #{offset}
+
+		</if>
+
+		<if test="type == 'withdrawal'">
+			select h.id, h.amount, h.w_balance AS balance,
+			h.created_at,
+			coalesce(cast(da.number as CHAR(10) ), 'ATM') as receiver,
+			wa.number as sender
+			from history_tb as h
+			left join account_tb as wa on wa.id = h.w_account_id
+			left join account_tb as da on da.id = h.d_account_id
+			where h.w_account_id = #{accountId}
+			limit #{limit} offset #{offset}
+
+		</if>
+	</select>
+
+	
+	
+	
+	
+	<select id="countByAccountIdAndType" resultType="int">
+		<if test="type == 'all'">
+			select count(*)
 			from history_tb as h 
-			left join account_tb as wa on h.w_account_id = wa.id
-			left join account_tb as da on h.d_account_id = da.id  
 			where h.w_account_id = #{accountId} OR h.d_account_id = #{accountId}
 		</if>
 		<if test="type == 'deposit'">
-			select h.id, h.amount, h.d_balance as balance, h.created_at, 
-				coalesce(CAST(wa.number as CHAR(10)) , 'ATM') as sender, 
-			    da.number as receiver
+			select count(*)
 			from history_tb as h 
-			left join account_tb as wa on wa.id = h.w_account_id
-			left join account_tb as da on da.id = h.d_account_id 
 			where h.d_account_id = #{accountId}
 		</if>
 		
 		<if test="type == 'withdrawal'">
-			select h.id, h.amount, h.w_balance AS balance, h.created_at, 
-				   coalesce(cast(da.number as CHAR(10)), 'ATM')  as receiver, 
-			       wa.number as sender 
+			select count(*)
 			from history_tb as h 
-			left join account_tb as wa on wa.id = h.w_account_id
-			left join account_tb as da on da.id = h.d_account_id 
 			where h.w_account_id = #{accountId}
 		</if>
 	</select>
-
+	
 </mapper>
