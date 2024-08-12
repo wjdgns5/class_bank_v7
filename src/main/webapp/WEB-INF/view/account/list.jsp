@@ -28,7 +28,8 @@
 				<tbody>
 					<c:forEach  var="account"   items="${accountList}">
 						<tr>
-							<td>${account.number}</td>
+							<%-- 동적 작동하는 부분 Type=all --%>
+							<td> <a href="/account/detail/${account.id}?type=all">${account.number}</a>  </td>
 							<td>${account.balance}</td>
 						</tr>
 					</c:forEach>

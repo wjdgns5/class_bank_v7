@@ -1,6 +1,7 @@
 package com.tenco.bank.service;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.h2.value.Transfer;
@@ -20,6 +21,7 @@ import com.tenco.bank.repository.interfaces.AccountRepository;
 import com.tenco.bank.repository.interfaces.HistoryRepository;
 import com.tenco.bank.repository.model.Account;
 import com.tenco.bank.repository.model.History;
+import com.tenco.bank.repository.model.HistoryAccount;
 import com.tenco.bank.repository.model.User;
 import com.tenco.bank.utils.Define;
 
@@ -228,5 +230,35 @@ public class AccountService {
     		throw new DataDeliveryException(Define.FAILED_PROCESSING, HttpStatus.INTERNAL_SERVER_ERROR);
     		}
     	}  	
+    
+    /**
+     * 단일 계좌 조회 기능 (accountId 기준)
+     * @param accountId
+     * @return
+     */
+    public Account readAccountById(Integer accountId) {
+    	Account accountEntity = accountRepository.findByAccountId(accountId);
+    	if(accountEntity == null) {
+    		throw new DataDeliveryException(Define.NOT_EXIST_ACCOUNT, HttpStatus.INTERNAL_SERVER_ERROR);
+    	}
+    	return accountEntity;
+    }
+    
+    /**
+     * 단일 계좌거래 내역 조회
+     * @param type : [all, deposit, withdrawal]
+     * @param accountId (pk)
+     * @return 전체, 입금, 출금 거래내역(3가지 타입) 반환
+     */
+   // @Transactional
+    public List<HistoryAccount> readHistoryByAccountId(String type, Integer accountId) {
+    	List<HistoryAccount> list = new ArrayList<HistoryAccount>();
+    	list = historyRepository.findByAccountIdAndTypeOfHistory(type, accountId);
+    	
+    	return list;
+    }
+    
+    
+    
 }
 
