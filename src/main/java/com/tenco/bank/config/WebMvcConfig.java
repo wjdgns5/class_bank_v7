@@ -1,7 +1,10 @@
 package com.tenco.bank.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -27,4 +30,11 @@ public class WebMvcConfig implements WebMvcConfigurer {
 				.addPathPatterns("/auth/**");
 			
 	} // end of addInterceptors()
+	
+	@Bean // IOC 대상 (싱글톤 처리)
+	PasswordEncoder passwordEncoder() { // 회원가입 기능에 DI 해야한다. --> @bean 사용
+		return new BCryptPasswordEncoder(); // 회원가입할 때 비밀번호 암호화
+	}
+	
+	
 }

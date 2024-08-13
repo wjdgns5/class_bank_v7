@@ -32,6 +32,7 @@ dependencies {
 	
 	// TODO - tools xml 파일 error check 
 	providedCompile 'javax.servlet:javax.servlet-api:3.1.0'
+	implementation 'org.springframework.security:spring-security-crypto'  // 추가
 
 
 	implementation 'org.springframework.boot:spring-boot-starter-web'

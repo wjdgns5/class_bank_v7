@@ -14,13 +14,15 @@ spring:
       
   datasource:
     
-#    url: jdbc:mysql://localhost:3306/mybank?serverTimeZone=Asia/Seoul
-#    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/mybank?serverTimeZone=Asia/Seoul
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root # 사용자 ID를 지정
+    password: asd123 # DB 비밀번호 여기서는 빈 문자열로 설정 
   
-    url: jdbc:h2:mem:bankdb;MODE=MySQL # 데이터베이스 연결을 위한 URL을 설정 합니다.
-    driver-class-name: org.h2.Driver # 드라이버 클래스를 설정합니다. 
-    username: sa # 사용자 ID를 지정
-    password: '' # DB 비밀번호 여기서는 빈 문자열로 설정 
+#    url: jdbc:h2:mem:bankdb;MODE=MySQL # 데이터베이스 연결을 위한 URL을 설정 합니다.
+#    driver-class-name: org.h2.Driver # 드라이버 클래스를 설정합니다. 
+#    username: sa # 사용자 ID를 지정
+#    password: '' # DB 비밀번호 여기서는 빈 문자열로 설정 
   sql:
     init:
       schema-locations:
