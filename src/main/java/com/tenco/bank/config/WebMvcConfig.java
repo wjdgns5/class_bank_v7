@@ -1,0 +1,30 @@
+package com.tenco.bank.config;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import com.tenco.bank.handler.AuthInterceptor;
+
+import lombok.RequiredArgsConstructor;
+
+@Configuration // 하나 이상의 bean을 등록
+@RequiredArgsConstructor // 생성자 대신에 사용할 수 있음
+public class WebMvcConfig implements WebMvcConfigurer {
+	// implements WebMvcConfigurer : 설정 파일로 사용할 수 있다. 
+	
+	@Autowired // DI 
+	private final AuthInterceptor authInterceptor; // final 사용하면 @Autowired 사용못함
+	
+	// @RequiredArgsConstructor // 생성자 대신에 사용할 수 있음
+	
+	// 우리가 만들어 놓은 AuthInterceptor를 등록해야 함.
+	@Override
+	public void addInterceptors(InterceptorRegistry registry) {
+		registry.addInterceptor(authInterceptor)
+				.addPathPatterns("/account/**") // /account 뒤에 있는 모든 디렉토리 파일을 의미한다.
+				.addPathPatterns("/auth/**");
+			
+	} // end of addInterceptors()
+}
