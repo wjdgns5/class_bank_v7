@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.tenco.bank.handler.AuthInterceptor;
@@ -30,6 +31,19 @@ public class WebMvcConfig implements WebMvcConfigurer {
 				.addPathPatterns("/auth/**");
 			
 	} // end of addInterceptors()
+	
+	// 코드 추가
+	// C:\Lightshot/a.png <-- 서버 컴퓨터상에 실체 이미지 경로지만 
+	// 프로젝트 상에서 (클라이언트가 HTML 소스로 보이는 경로는) /images/uploads./**
+	@Override
+	public void addResourceHandlers(ResourceHandlerRegistry registry) {
+		// 1. 
+		registry.addResourceHandler("/images/uploads/**")
+		.addResourceLocations("file:\\C:\\work_spring\\upload/");
+	}
+	
+	
+	
 	
 	@Bean // IOC 대상 (싱글톤 처리)
 	PasswordEncoder passwordEncoder() { // 회원가입 기능에 DI 해야한다. --> @bean 사용

@@ -21,13 +21,13 @@ public class GlobalControllerAdvice {
 	 * 둘 중 누가 예외를 잡나요? 자세한 것은 DataDeliveryException 그 외의 범위는 exception
 	 */
 	
-	@ExceptionHandler(Exception.class) // 오류들은 여기서 걸린다.
-	public void exception(Exception e) {
-		System.out.println("------------------");
-		System.out.println(e.getClass().getName());
-		System.out.println(e.getMessage());
-		System.out.println("------------------");
-	}
+//	@ExceptionHandler(Exception.class) // 오류들은 여기서 걸린다.
+//	public void exception(Exception e) {
+//		System.out.println("------------------");
+//		System.out.println(e.getClass().getName());
+//		System.out.println(e.getMessage());
+//		System.out.println("------------------");
+//	}
 	
 	/**
 	 * Data로 예외를 내려주는 방법

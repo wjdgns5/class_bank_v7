@@ -9,12 +9,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.tenco.bank.dto.SignInDTO;
 import com.tenco.bank.dto.SignUpDTO;
+import com.tenco.bank.dto.kakaoDTO;
 import com.tenco.bank.handler.exception.DataDeliveryException;
 import com.tenco.bank.repository.model.User;
 import com.tenco.bank.service.UserService;
 import com.tenco.bank.utils.Define;
 
 import jakarta.servlet.http.HttpSession;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
 
 @Controller // IoC에 대상(싱글톤 패턴으로 관리됨) 
 @RequestMapping("/user") // 대문 처리 
@@ -123,5 +127,19 @@ public class UserController {
 		
 		return "redirect:/user/sign-in";
 	}
+	
+	/**
+	 * 카카오 ?
+	 * @param param
+	 * @return
+	 */
+	@GetMapping("/kakao")
+	@ResponseBody
+	public String getMethodName(kakaoDTO dto) {
+		System.out.println( "카카오의 어떤 코드 : " + dto.getCode());
+		return dto.getCode();
+	}
+
+	
 	
 }

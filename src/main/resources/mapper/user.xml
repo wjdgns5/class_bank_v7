@@ -9,8 +9,8 @@
 	
 	<!-- id는 매칭되어 있는 인터페이스에 메서드 명과 같아야 한다.  -->
 	<insert id="insert">
-		insert into user_tb(username, password, fullname, created_at) 
-		values( #{username}, #{password}, #{fullname}, now())
+		insert into user_tb(username, password, fullname, origin_file_name, upload_file_name) 
+		values( #{username}, #{password}, #{fullname}, #{originFileName}, #{uploadFileName})
 	</insert>
 	
 	<update id="updateById">

@@ -1,11 +1,18 @@
 package com.tenco.bank.service;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.UUID;
+
+import org.apache.catalina.authenticator.SavedRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.tenco.bank.dto.SignInDTO;
 import com.tenco.bank.dto.SignUpDTO;
@@ -13,6 +20,7 @@ import com.tenco.bank.handler.exception.DataDeliveryException;
 import com.tenco.bank.handler.exception.RedirectException;
 import com.tenco.bank.repository.interfaces.UserRepository;
 import com.tenco.bank.repository.model.User;
+import com.tenco.bank.utils.Define;
 
 import lombok.RequiredArgsConstructor;
 
@@ -24,6 +32,10 @@ public class UserService {
 	private final UserRepository userRepository;
 	@Autowired // 생성자 대신에 사용할 수 있음
 	private final PasswordEncoder passwordEncoder;
+	
+	// 초기 파라미터 가져오는 방법
+	@Value("${file.upload-dir}")
+	private String uploadDir;
 	
 //  @Autowired // 어노테이션으로 대체 가능 하다.
 //  생성자 의존 주입 - DI 
@@ -41,6 +53,19 @@ public class UserService {
 	public void createUser(SignUpDTO dto) {
 		
 		int result = 0; 
+		
+		System.out.println("----------------------------------");
+		System.out.println(dto.getMFile().getOriginalFilename());
+		System.out.println("----------------------------------");
+		
+		if(!dto.getMFile().isEmpty()) {
+			// 파일 업로드 로직 구현
+			String[] fileNames = uploadFile(dto.getMFile());
+			
+			dto.setOriginFileName(fileNames[0]);
+			dto.setUploadFileName(fileNames[1]);
+		}
+		
 		try {
 			
 			// 코드 추가 부분
@@ -98,7 +123,54 @@ public class UserService {
 		return userEntity;
 	}
 	
-	
+	/**
+	 * 서버 운영체제에 파일 업로드 기능
+	 * 
+	 * @param mFile
+	 */
+	private String[] uploadFile(MultipartFile mFile) {
+		// 파일 업로드 구현
+		
+		// 방어적 코드
+		if(mFile.getSize() > Define.MAX_FILE_SIZE) {
+			throw new DataDeliveryException("파일 크기는 20MB 이상 클 수 없습니다.", HttpStatus.BAD_REQUEST);
+		}
+		
+		// 서버 컴퓨터에 파일을 넣을 디렉토리가 있는지 검사 
+		//	String saveDirectory = uploadDir; // C:\\work_spring\\upload/
+		//	System.out.println("saveDirectory : " + saveDirectory);
+		//	String saveDirectory = Define.UPLOAD_FILE_DERECTORY; // C:\\work_spring\\upload/
+		// 사전기반 지식 - 윈도우, 리눅스
+		//	File directory = new File(saveDirectory);
+		//	if(!directory.exists()) {
+		// 존재하면 true 반환 존재하지 않으면 false 반환
+		//		directory.mkdirs();
+		//	}
+		
+		// 코드 수정
+		// File - getAbsolutePath() :  파일 시스템의 절대 경로를 나타냅니다.
+		// (리눅스 또는 MacOS)에 맞춰서 절대 경로가 생성을 시킬 수 있다.  
+		String saveDirectory = (uploadDir);
+		System.out.println("saveDirectory : " +  saveDirectory);
+		
+		
+		// 파일 이름 생성(중복 이름 예방)
+		String uploadFileName = UUID.randomUUID() + "_" + mFile.getOriginalFilename();
+		// 파일 전체경로 + 새로 생성한 파일명
+	//	String uploadPath = saveDirectory + uploadFileName;
+		String uploadPath = saveDirectory + File.separator + uploadFileName; // 리눅스나 이런데서 사용
+		File destination = new File(uploadPath); 
+		
+		// 반드시 수행 
+		try {
+			mFile.transferTo(destination); // transferTo 옮기는 작업
+		} catch (IllegalStateException | IOException e) {
+			e.printStackTrace(); 
+			throw new DataDeliveryException("파일 업로드 중에 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		
+		return new String[] {mFile.getOriginalFilename(), uploadFileName}; // 리턴과 동시에 초기화 작업  
+	}
 	
 
 	

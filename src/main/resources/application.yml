@@ -11,6 +11,11 @@ spring:
     view:
      prefix: /WEB-INF/view/ #JSP 파일이 위치한 디렉토리 접두사를 설정합니다.
      suffix: .jsp # 뷰 이름에 자동으로 추가될 파일 확장자를 설정합니다.
+
+  servlet:
+    multipart:
+      max-file-size: 20MB # 파일 최대 크기는 20MB로 제한한다.
+      max-request-size: 20MB # 멀티파트 전체 요청 크기 20MB 제한
       
   datasource:
     
@@ -52,3 +57,13 @@ mybatis:
 logging:
   level:
     org.apache.ibatis: DEBUG #MyBatis 로깅 레벨을 DEBUG로 설정하여 실행되는 SQL 쿼리와 내부 로깅 정보를 콘솔에 출력합니다.
+    
+# 초기 파라미터 설정 
+file:
+  # define에 경로가 있음
+ upload-dir: C:\\work_spring\\upload/
+    
+    
+    
+    
+    
